@@ -1,16 +1,43 @@
-export const App = () => {
+import { Suspense, lazy } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import PrivateGuard from '../guards/PrivateGuard';
+// import HomePage from '../pages/HomePage'
+// import UsersPage from '../pages/UsersPage'
+// import Layout from '../Layout/Layout'
+// import ErrorPage from '../pages/ErrorPage'
+// import UserDetailsPage from '../pages/UserDetailsPage'
+
+const HomePage = lazy(() => import('../pages/HomePage'));
+const UsersPage = lazy(() => import('../pages/UsersPage'));
+const Layout = lazy(() => import('../Layout/Layout'));
+const ErrorPage = lazy(() => import('../pages/ErrorPage'));
+const UserDetailsPage = lazy(() => import('../pages/UserDetailsPage'));
+
+const App = () => {
   return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 40,
-        color: '#010101'
-      }}
-    >
-      React homework template
-    </div>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route
+          path="users"
+          element={
+            <PrivateGuard>
+              <UsersPage />
+            </PrivateGuard>
+          }
+        />
+        <Route path="users/details/:id" element={<UserDetailsPage />} />
+      </Route>
+      <Route
+        path="*"
+        element={
+          <Suspense fallback={<h1>Loading...</h1>}>
+            <ErrorPage />
+          </Suspense>
+        }
+      />
+    </Routes>
   );
 };
+
+export default App;
